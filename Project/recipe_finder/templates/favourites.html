@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}My Favourite Recipes | NANO'S CRAVING CO. 💖{% endblock %}
+
+{% block content %}
+<div class="page-header-banner">
+  <div class="container text-center">
+    <span class="section-tag">SAVED FOR LATER</span>
+    <h1 class="page-title">My Favourite Cravings 💖</h1>
+    <p class="page-subtitle">
+      All the recipes you loved and saved in one cozy aesthetic cookbook collection.
+    </p>
+  </div>
+</div>
+
+<div class="container favourites-page-container">
+  {% if recipes %}
+    <div class="fav-header-bar">
+      <div>
+        <span class="count-badge">{{ recipes | length }}</span>
+        <span>Recipes Saved in Your Book</span>
+      </div>
+      <a href="{{ url_for('recipes') }}" class="btn-outline">
+        <i class="fa-solid fa-plus"></i> Explore & Add More
+      </a>
+    </div>
+
+    <div class="recipes-grid">
+      {% for r in recipes %}
+        <div class="recipe-card" id="recipeCard-{{ r.id }}">
+          <!-- Food Image ABOVE Name & Ingredients -->
+          <div class="card-img-container">
+            <img 
+              src="{{ r.image_url }}" 
+              alt="{{ r.name }}" 
+              class="recipe-img"
+              loading="lazy"
+              onerror="this.onerror=null; this.src='{{ r.local_image }}';"
+            >
+            <!-- Dietary Badge -->
+            <span class="diet-badge diet-{{ r.dietary.lower().replace('-', '') }}">
+              {% if r.dietary == 'Vegetarian' %}🟢 Veg
+              {% elif r.dietary == 'Vegan' %}🌱 Vegan
+              {% else %}🔴 Non-Veg{% endif %}
+            </span>
+            <span class="cuisine-badge">{{ r.cuisine }}</span>
+
+            <!-- Heart Toggle Button -->
+            <button 
+              type="button" 
+              class="btn-fav is-favourite" 
+              data-recipe-id="{{ r.id }}"
+              title="Remove from Favourites"
+              aria-label="Remove from Favourites"
+            >
+              <i class="fa-solid fa-heart"></i>
+            </button>
+          </div>
+
+          <div class="card-body">
+            <div class="card-meta">
+              <span><i class="fa-regular fa-clock"></i> {{ r.cook_time }} mins</span>
+              <span><i class="fa-solid fa-fire"></i> {{ r.difficulty }}</span>
+              <span><i class="fa-solid fa-users"></i> {{ r.servings }} Servings</span>
+            </div>
+
+            <h3 class="recipe-title">{{ r.name }}</h3>
+            <p class="recipe-desc">{{ r.description }}</p>
+
+            <div class="card-footer">
+              <a href="{{ url_for('recipe_details', recipe_id=r.id) }}" class="btn-card-view">
+                View Recipe <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="empty-recipes-state">
+      <div class="empty-icon">💔🍰</div>
+      <h3>Your Favourites Cookbook is Empty!</h3>
+      <p>
+        You haven't saved any recipes yet. Browse our 50 handcrafted recipes and tap the heart icon on any dish that makes your mouth water!
+      </p>
+      <div class="empty-actions">
+        <a href="{{ url_for('recipes') }}" class="btn-primary">
+          <i class="fa-solid fa-utensils"></i> Explore 50 Recipes
+        </a>
+        <a href="{{ url_for('preferences') }}" class="btn-secondary">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Get My Personalised Picks
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

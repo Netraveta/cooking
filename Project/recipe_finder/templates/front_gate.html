@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Welcome to NANO'S CRAVING CO. | Recipe World 🍽️</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="front-gate-body">
+
+  <!-- ====================================================================== -->
+  <!-- No-Scroll Front Page User Options Gate (100vh Fixed Viewport) -->
+  <!-- ====================================================================== -->
+  <main class="front-gate-screen">
+    <!-- Top Tiny Notice -->
+    <div class="gate-top-bar">
+      <span>✨ Welcome to <strong>NANO'S CRAVING CO.</strong> — Enter your options to unlock your Recipe World! 🍰🥑 ✨</span>
+    </div>
+
+    <div class="gate-container">
+      <div class="gate-card-wrapper">
+        
+        <!-- Left Side: Aesthetic Cafe Intro & Brand Showcase -->
+        <div class="gate-intro-col">
+          <div class="gate-brand-badge">
+            <span class="gate-logo-emoji">🍰</span>
+            <div>
+              <span class="gate-brand-name">NANO'S CRAVING CO.</span>
+              <span class="gate-brand-sub">Recipe World 🍽️</span>
+            </div>
+          </div>
+
+          <div class="gate-hero-text">
+            <span class="gate-tag-pill">💖 GIRLY CAFE AESTHETIC</span>
+            <h1 class="gate-main-heading">
+              Your Dream <span class="gradient-text">Kitchen Awaits</span> ✨
+            </h1>
+            <p class="gate-subtext">
+              Set your craving preferences and party size below. Once you click enter, the full world of 50 handcrafted recipes will unlock for you!
+            </p>
+          </div>
+
+          <!-- Feature Perks -->
+          <div class="gate-perks">
+            <div class="gate-perk-item">
+              <span class="gpi-icon">🥑</span>
+              <span>50 Full Recipes (10 Mexican, 10 Italian, 10 Indian, 10 Chinese, 10 American)</span>
+            </div>
+            <div class="gate-perk-item">
+              <span class="gpi-icon">👥</span>
+              <span>Dynamic People/Quantity Ingredient Scaling</span>
+            </div>
+            <div class="gate-perk-item">
+              <span class="gpi-icon">🛡️</span>
+              <span>Smart Allergy & Restricted Ingredients Filter</span>
+            </div>
+          </div>
+
+          <!-- Decorative Chef Quote -->
+          <div class="gate-quote">
+            <span>"Cooking is self-love in delicious form!" — Nano 🍰</span>
+          </div>
+        </div>
+
+        <!-- Right Side: User Options Form (Locks other pages until entered) -->
+        <div class="gate-form-col">
+          <div class="gate-form-header">
+            <h2>Select Your Options 🍽️</h2>
+            <p>Tell us who's eating so we can tailor the menu!</p>
+          </div>
+
+          <form action="{{ url_for('enter_site') }}" method="POST" class="gate-form" id="gateUserForm">
+            
+            <!-- 1. Full Name -->
+            <div class="gate-input-group">
+              <label for="gateUserName">
+                <i class="fa-regular fa-user"></i> <strong>Full Name</strong>
+              </label>
+              <input 
+                type="text" 
+                id="gateUserName" 
+                name="name" 
+                placeholder="e.g. Maya Sharma" 
+                value="{% if current_user_profile %}{{ current_user_profile.name }}{% endif %}"
+                required
+              >
+            </div>
+
+            <!-- 2. Food Preference (Includes Both (Veg & Non-Veg) Option) -->
+            <div class="gate-input-group">
+              <label>
+                <i class="fa-solid fa-utensils"></i> <strong>Food Preference</strong>
+              </label>
+              <div class="gate-diet-grid">
+                <!-- Option 1: Both (Veg & Non-Veg) -->
+                <label class="gate-radio-pill active-diet">
+                  <input 
+                    type="radio" 
+                    name="preference" 
+                    value="Both (Veg & Non-Veg)" 
+                    {% if not current_user_profile or current_user_profile.preference == 'Both (Veg & Non-Veg)' or current_user_profile.preference == 'Both' %}checked{% endif %}
+                  >
+                  <span class="diet-pill-body">
+                    <span class="diet-icon">💖</span>
+                    <span class="diet-label">Both (Veg & Non-Veg)</span>
+                  </span>
+                </label>
+
+                <!-- Option 2: Vegetarian -->
+                <label class="gate-radio-pill">
+                  <input 
+                    type="radio" 
+                    name="preference" 
+                    value="Vegetarian"
+                    {% if current_user_profile and current_user_profile.preference == 'Vegetarian' %}checked{% endif %}
+                  >
+                  <span class="diet-pill-body">
+                    <span class="diet-icon">🟢</span>
+                    <span class="diet-label">Vegetarian</span>
+                  </span>
+                </label>
+
+                <!-- Option 3: Non-Vegetarian -->
+                <label class="gate-radio-pill">
+                  <input 
+                    type="radio" 
+                    name="preference" 
+                    value="Non-Vegetarian"
+                    {% if current_user_profile and current_user_profile.preference == 'Non-Vegetarian' %}checked{% endif %}
+                  >
+                  <span class="diet-pill-body">
+                    <span class="diet-icon">🔴</span>
+                    <span class="diet-label">Non-Veg</span>
+                  </span>
+                </label>
+
+                <!-- Option 4: Vegan -->
+                <label class="gate-radio-pill">
+                  <input 
+                    type="radio" 
+                    name="preference" 
+                    value="Vegan"
+                    {% if current_user_profile and current_user_profile.preference == 'Vegan' %}checked{% endif %}
+                  >
+                  <span class="diet-pill-body">
+                    <span class="diet-icon">🌱</span>
+                    <span class="diet-label">Vegan</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 3. Quantity (People Eating) Stepper -->
+            <div class="gate-input-group">
+              <label>
+                <i class="fa-solid fa-users"></i> <strong>Adjust Quantity (People Eating)</strong>
+              </label>
+              <div class="quantity-stepper-box">
+                <button type="button" class="btn-step" id="btnGateMinus" aria-label="Decrease People">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <div class="stepper-center">
+                  <input 
+                    type="number" 
+                    id="gatePeopleInput" 
+                    name="people_count" 
+                    value="{% if current_user_profile and current_user_profile.people_count %}{{ current_user_profile.people_count }}{% else %}2{% endif %}" 
+                    min="1" 
+                    max="20" 
+                    readonly
+                  >
+                  <span class="stepper-label-text" id="gatePeopleText">People Eating</span>
+                </div>
+                <button type="button" class="btn-step" id="btnGatePlus" aria-label="Increase People">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <!-- Quick Chips -->
+              <div class="quantity-quick-chips">
+                <button type="button" class="chip-btn" data-val="1">Solo (1)</button>
+                <button type="button" class="chip-btn active-chip" data-val="2">Pair (2)</button>
+                <button type="button" class="chip-btn" data-val="4">Family (4)</button>
+                <button type="button" class="chip-btn" data-val="6">Party (6+)</button>
+              </div>
+            </div>
+
+            <!-- 4. Favourite Cuisine & Optional Allergies Row -->
+            <div class="gate-row-dual">
+              <div class="gate-input-group flex-1">
+                <label for="gateCuisine">
+                  <i class="fa-solid fa-globe"></i> <strong>Favourite Cuisine</strong>
+                </label>
+                <select id="gateCuisine" name="favourite_cuisine" class="gate-select">
+                  <option value="Italian" {% if not current_user_profile or current_user_profile.favourite_cuisine == 'Italian' %}selected{% endif %}>🍕 Italian</option>
+                  <option value="Mexican" {% if current_user_profile and current_user_profile.favourite_cuisine == 'Mexican' %}selected{% endif %}>🌮 Mexican</option>
+                  <option value="Indian" {% if current_user_profile and current_user_profile.favourite_cuisine == 'Indian' %}selected{% endif %}>🍛 Indian</option>
+                  <option value="Chinese" {% if current_user_profile and current_user_profile.favourite_cuisine == 'Chinese' %}selected{% endif %}>🥟 Chinese</option>
+                  <option value="American" {% if current_user_profile and current_user_profile.favourite_cuisine == 'American' %}selected{% endif %}>🍔 American</option>
+                </select>
+              </div>
+
+              <div class="gate-input-group flex-1">
+                <label for="gateAllergies">
+                  <i class="fa-solid fa-shield-halved"></i> <strong>Allergies to Avoid</strong>
+                </label>
+                <input 
+                  type="text" 
+                  id="gateAllergies" 
+                  name="allergies" 
+                  placeholder="e.g. peanuts, mushrooms" 
+                  value="{% if current_user_profile and current_user_profile.allergies %}{{ current_user_profile.allergies }}{% endif %}"
+                >
+              </div>
+            </div>
+
+            <!-- 5. Submit CTA Button -->
+            <div class="gate-cta-wrap">
+              <button type="submit" class="btn-enter-recipe-world">
+                <span>Enter Recipe World 🍽️✨</span>
+                <i class="fa-solid fa-sparkles"></i>
+              </button>
+            </div>
+
+            <!-- Guest Quick Link -->
+            <div class="gate-guest-link">
+              <a href="{{ url_for('explore_site') }}">
+                Skip options & browse all 50 recipes as Guest <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Front Gate Interactivity (No scrolling required)
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("gatePeopleInput");
+      const label = document.getElementById("gatePeopleText");
+      const btnMinus = document.getElementById("btnGateMinus");
+      const btnPlus = document.getElementById("btnGatePlus");
+      const chips = document.querySelectorAll(".chip-btn");
+      const radioPills = document.querySelectorAll(".gate-radio-pill");
+
+      function updatePeople(val) {
+        let n = parseInt(val, 10);
+        if (isNaN(n) || n < 1) n = 1;
+        if (n > 20) n = 20;
+        input.value = n;
+        label.textContent = n === 1 ? "Person Eating" : "People Eating";
+
+        // Update chips
+        chips.forEach(c => {
+          if (parseInt(c.dataset.val, 10) === n) {
+            c.classList.add("active-chip");
+          } else {
+            c.classList.remove("active-chip");
+          }
+        });
+      }
+
+      if (btnMinus) {
+        btnMinus.addEventListener("click", () => {
+          updatePeople(parseInt(input.value, 10) - 1);
+        });
+      }
+
+      if (btnPlus) {
+        btnPlus.addEventListener("click", () => {
+          updatePeople(parseInt(input.value, 10) + 1);
+        });
+      }
+
+      chips.forEach(c => {
+        c.addEventListener("click", () => {
+          updatePeople(c.dataset.val);
+        });
+      });
+
+      // Highlight selected radio pill
+      radioPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+          radioPills.forEach(p => p.classList.remove("active-diet"));
+          pill.classList.add("active-diet");
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}NANO'S CRAVING CO. | Recipe World 🍽️{% endblock %}</title>
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for aesthetics -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- ====================================================================== -->
+  <!-- Top Cute Notice Bar -->
+  <!-- ====================================================================== -->
+  <div class="top-announcement">
+    <span>✨ Welcome to <strong>NANO'S CRAVING CO.</strong> — Where Girly Aesthetics Meet Delicious Cooking! 🍰🥑 50 Handcrafted Recipes Waiting For You! ✨</span>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- Navigation Bar -->
+  <!-- ====================================================================== -->
+  <header class="navbar-wrapper">
+    <nav class="navbar container">
+      <!-- Brand Logo -->
+      <a href="{{ url_for('explore_site') }}" class="brand-logo">
+        <span class="brand-icon">🍰</span>
+        <div class="brand-text">
+          <span class="brand-title">NANO'S CRAVING CO.</span>
+          <span class="brand-subtitle">Recipe World 🍽️</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <ul class="nav-links" id="navLinks">
+        <li>
+          <a href="{{ url_for('explore_site') }}" class="{% if request.endpoint == 'explore_site' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('recipes') }}" class="{% if request.endpoint == 'recipes' %}active{% endif %}">
+            <i class="fa-solid fa-utensils"></i> All Recipes
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('explore_site') }}#categories">
+            <i class="fa-solid fa-shapes"></i> Categories
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('explore_site') }}#about">
+            <i class="fa-solid fa-heart"></i> About Us
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('explore_site') }}#contact">
+            <i class="fa-solid fa-envelope"></i> Contact
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('preferences') }}" class="nav-btn-profile {% if request.endpoint == 'preferences' %}active{% endif %}">
+            <i class="fa-solid fa-user-circle"></i> User Profile
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('favourites') }}" class="nav-btn-fav {% if request.endpoint == 'favourites' %}active{% endif %}" title="View Saved Recipes">
+            <i class="fa-solid fa-heart"></i>
+            <span class="fav-badge" id="navFavBadge">{{ fav_count }}</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ====================================================================== -->
+  <!-- Flash Alert Messages -->
+  <!-- ====================================================================== -->
+  <div class="container flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-alert alert-{{ category }}">
+            <span class="flash-icon">
+              {% if category == 'success' %}💖
+              {% elif category == 'warning' %}⚠️
+              {% elif category == 'info' %}✨
+              {% else %}🌸{% endif %}
+            </span>
+            <span class="flash-text">{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove();">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- Main Page Content Block -->
+  <!-- ====================================================================== -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ====================================================================== -->
+  <!-- Toast Notification Container for Instant Heart Feedback -->
+  <!-- ====================================================================== -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ====================================================================== -->
+  <!-- Girly Chic Footer -->
+  <!-- ====================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <!-- Footer Brand Column -->
+      <div class="footer-col brand-col">
+        <div class="footer-logo">
+          <span class="footer-icon">🍰</span>
+          <h3>NANO'S CRAVING CO.</h3>
+        </div>
+        <p class="footer-tagline">
+          Recipe World 🍽️ — Serving heartwarming flavors, aesthetic vibes, and easy-to-cook recipes for food lovers and dreamy home chefs everywhere.
+        </p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('recipes') }}">All 50 Recipes</a></li>
+          <li><a href="{{ url_for('preferences') }}">Personalized Quiz</a></li>
+          <li><a href="{{ url_for('suggestions') }}">Smart Suggestions</a></li>
+          <li><a href="{{ url_for('favourites') }}">My Saved Cravings</a></li>
+        </ul>
+      </div>
+
+      <!-- Cuisines -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Global Cuisines</h4>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('recipes', cuisine='Mexican') }}">🌮 Mexican (10 Recipes)</a></li>
+          <li><a href="{{ url_for('recipes', cuisine='Italian') }}">🍕 Italian (10 Recipes)</a></li>
+          <li><a href="{{ url_for('recipes', cuisine='Indian') }}">🍛 Indian (10 Recipes)</a></li>
+          <li><a href="{{ url_for('recipes', cuisine='Chinese') }}">🥟 Chinese (10 Recipes)</a></li>
+          <li><a href="{{ url_for('recipes', cuisine='American') }}">🍔 American (10 Recipes)</a></li>
+        </ul>
+      </div>
+
+      <!-- Girly Newsletter / Sweet Note -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Join The Craving Club ✨</h4>
+        <p class="footer-subtext">Get sweet recipes & cooking tips delivered fresh to your inbox every weekend!</p>
+        <form class="footer-newsletter" onsubmit="event.preventDefault(); alert('Yay! Welcome to the Craving Club 💖🍰');">
+          <input type="email" placeholder="Enter your email..." required>
+          <button type="submit" class="btn-newsletter"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+        <div class="footer-cute-badge">
+          <span>🎀 Made with love for college presentation & food lovers</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copyright Sub-Footer -->
+    <div class="footer-bottom">
+      <div class="container footer-bottom-content">
+        <p>&copy; 2026 <strong>NANO'S CRAVING CO.</strong> All rights reserved. 🍽️ Built with Flask, SQLite, HTML5 & CSS3.</p>
+        <p class="credits">Designed with 💖 Cream, Light Green & Pastel Orange Vibes</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript File -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

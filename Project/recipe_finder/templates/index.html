@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}NANO'S CRAVING CO. | Recipe World 🍽️ - Discover Delicious Recipes{% endblock %}
+
+{% block content %}
+<!-- ======================================================================== -->
+<!-- 1. Hero Section -->
+<!-- ======================================================================== -->
+<section class="hero-section">
+  <div class="container hero-container">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span>✨ NANO'S CRAVING CO. EXCLUSIVE</span>
+      </div>
+      <h1 class="hero-heading">
+        Discover <span class="gradient-text">Delicious Recipes</span> 🍽️
+      </h1>
+      <p class="hero-subtitle">
+        Find your favourite food and learn to cook it.
+      </p>
+      
+      <!-- Big Search Bar -->
+      <form action="{{ url_for('recipes') }}" method="GET" class="hero-search-bar">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input 
+          type="text" 
+          name="search" 
+          placeholder="Search by recipe name or ingredient (e.g. Tacos, Pasta, Biryani, Cheese)..." 
+          autocomplete="off"
+          required
+        >
+        <button type="submit" class="btn-search-hero">
+          <span>Search Recipes</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Quick Action Buttons & Highlights -->
+      <div class="hero-actions">
+        <a href="{{ url_for('recipes') }}" class="btn-primary">
+          <i class="fa-solid fa-compass"></i> Explore Recipes
+        </a>
+        <a href="{{ url_for('preferences') }}" class="btn-secondary">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Get Personalised Picks
+        </a>
+      </div>
+
+      <!-- Girly Perks Badges -->
+      <div class="hero-badges">
+        <div class="perk-badge">
+          <span class="perk-icon">🥑</span>
+          <span>50 Handcrafted Recipes</span>
+        </div>
+        <div class="perk-badge">
+          <span class="perk-icon">🌍</span>
+          <span>5 Global Cuisines</span>
+        </div>
+        <div class="perk-badge">
+          <span class="perk-icon">💖</span>
+          <span>100% Free & Beginner Friendly</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Visual / Floating Dish Cards -->
+    <div class="hero-visual">
+      <div class="hero-image-wrapper">
+        <img 
+          src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80" 
+          alt="Fresh Gourmet Dish" 
+          class="hero-main-img"
+          onerror="this.onerror=null; this.src='/static/images/recipe_4.svg';"
+        >
+        <div class="floating-badge badge-top">
+          <span class="badge-emoji">🌮</span>
+          <div class="badge-info">
+            <strong>Fresh & Healthy</strong>
+            <small>Guacamole & Tacos</small>
+          </div>
+        </div>
+        <div class="floating-badge badge-bottom">
+          <span class="badge-emoji">🍰</span>
+          <div class="badge-info">
+            <strong>Sweetest Bakes</strong>
+            <small>Cheesecake & Tiramisu</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================== -->
+<!-- 2. Food Category Cards Section -->
+<!-- ======================================================================== -->
+<section class="section categories-section" id="categories">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-tag">TASTE THE GLOBE</span>
+      <h2 class="section-title">Explore by Cuisine Categories 🌍</h2>
+      <p class="section-desc">
+        Click on any of our 5 signature cuisines to discover 10 authentic recipes hand-picked for your kitchen!
+      </p>
+    </div>
+
+    <div class="categories-grid">
+      {% for cat in categories %}
+        <a href="{{ url_for('recipes', cuisine=cat.name) }}" class="category-card" style="--card-accent: {{ cat.bg }};">
+          <div class="category-emoji">{{ cat.flag }}</div>
+          <h3 class="category-name">{{ cat.name }}</h3>
+          <span class="category-count">{{ cat.text }}</span>
+          <p class="category-desc">{{ cat.desc }}</p>
+          <span class="category-arrow">
+            Explore 10 Dishes <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================== -->
+<!-- 3. Popular Recipes Section -->
+<!-- ======================================================================== -->
+<section class="section popular-section" id="popular">
+  <div class="container">
+    <div class="section-header section-header-split">
+      <div>
+        <span class="section-tag">CHEF'S TOP PICKS</span>
+        <h2 class="section-title">Popular Recipes Right Now 🔥</h2>
+        <p class="section-desc">
+          Loved by home chefs, aesthetic foodies, and quick weekday cravers!
+        </p>
+      </div>
+      <a href="{{ url_for('recipes') }}" class="btn-outline">
+        View All 50 Recipes <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Recipe Cards Grid -->
+    <div class="recipes-grid">
+      {% for r in popular_recipes %}
+        <div class="recipe-card">
+          <!-- Food Image ABOVE Name & Ingredients -->
+          <div class="card-img-container">
+            <img 
+              src="{{ r.image_url }}" 
+              alt="{{ r.name }}" 
+              class="recipe-img"
+              loading="lazy"
+              onerror="this.onerror=null; this.src='{{ r.local_image }}';"
+            >
+            <!-- Dietary Badge -->
+            <span class="diet-badge diet-{{ r.dietary.lower().replace('-', '') }}">
+              {% if r.dietary == 'Vegetarian' %}🟢 Veg
+              {% elif r.dietary == 'Vegan' %}🌱 Vegan
+              {% else %}🔴 Non-Veg{% endif %}
+            </span>
+            <!-- Country/Category Badge -->
+            <span class="cuisine-badge">{{ r.cuisine }}</span>
+
+            <!-- Favourite Button -->
+            <button 
+              type="button" 
+              class="btn-fav {% if r.id in fav_ids %}is-favourite{% endif %}" 
+              data-recipe-id="{{ r.id }}"
+              title="Save to Favourites"
+              aria-label="Save to Favourites"
+            >
+              <i class="{% if r.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+            </button>
+          </div>
+
+          <!-- Recipe Card Body -->
+          <div class="card-body">
+            <div class="card-meta">
+              <span><i class="fa-regular fa-clock"></i> {{ r.cook_time }} mins</span>
+              <span><i class="fa-solid fa-fire"></i> {{ r.difficulty }}</span>
+              <span><i class="fa-solid fa-users"></i> {{ r.servings }} Servings</span>
+            </div>
+
+            <h3 class="recipe-title">{{ r.name }}</h3>
+            <p class="recipe-desc">{{ r.description }}</p>
+
+            <div class="card-footer">
+              <a href="{{ url_for('recipe_details', recipe_id=r.id) }}" class="btn-card-view">
+                View Recipe <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================== -->
+<!-- 4. Featured Banner: Personalized Recommendations Teaser -->
+<!-- ======================================================================== -->
+<section class="container banner-container">
+  <div class="feature-banner">
+    <div class="banner-content">
+      <span class="banner-tag">💖 FOR YOU ONLY</span>
+      <h2>Craving Something Specific? Let's Find It!</h2>
+      <p>
+        Tell us your diet, favorite cuisine, and allergies. Our smart algorithm filters out ingredients you avoid and serves up dishes made just for you!
+      </p>
+      <div class="banner-btns">
+        <a href="{{ url_for('preferences') }}" class="btn-banner-primary">
+          <i class="fa-solid fa-heart"></i> Take 30-Sec Craving Quiz
+        </a>
+      </div>
+    </div>
+    <div class="banner-visual">
+      <div class="banner-icon-cluster">
+        <span class="cluster-icon ci-1">🍕</span>
+        <span class="cluster-icon ci-2">🥑</span>
+        <span class="cluster-icon ci-3">🥟</span>
+        <span class="cluster-icon ci-4">🥞</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================== -->
+<!-- 5. About Us Section -->
+<!-- ======================================================================== -->
+<section class="section about-section" id="about">
+  <div class="container about-container">
+    <div class="about-visual">
+      <div class="about-img-frame">
+        <img 
+          src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" 
+          alt="Nano's Kitchen Story" 
+          class="about-img"
+          onerror="this.onerror=null; this.src='/static/images/recipe_2.svg';"
+        >
+        <div class="about-quote-box">
+          <span class="quote-stars">⭐⭐⭐⭐⭐</span>
+          <p>"Cooking shouldn't be intimidating — it should feel like baking cookies with your best friend!"</p>
+          <small>— Nano, Founder & Head Craver</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-content">
+      <span class="section-tag">OUR SWEET STORY</span>
+      <h2 class="section-title">Welcome to NANO'S CRAVING CO. 🍰</h2>
+      <p class="about-lead">
+        We believe that good food creates the sweetest memories. That's why we created <strong>Recipe World 🍽️</strong> — a welcoming culinary sanctuary designed to make cooking joyful, aesthetic, and completely stress-free.
+      </p>
+      <p class="about-text">
+        Whether you are a college student whipping up your first meal, a beginner exploring global comfort foods, or someone searching for dishes without dairy or nuts, we have got you covered with 50 completely verified, delicious recipes.
+      </p>
+
+      <div class="about-highlights">
+        <div class="highlight-item">
+          <div class="hl-icon">🌱</div>
+          <div class="hl-text">
+            <strong>Inclusive for Everyone</strong>
+            <span>Vegetarian, Vegan, and Non-Veg dishes clearly labeled.</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <div class="hl-icon">⚡</div>
+          <div class="hl-text">
+            <strong>Quick Weeknight Magic</strong>
+            <span>From 10-minute snacks to showstopper weekend dinner plates.</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <div class="hl-icon">🎀</div>
+          <div class="hl-text">
+            <strong>Smart Allergy Filters</strong>
+            <span>Personalized recommendations tailored to your exact taste.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================== -->
+<!-- 6. Contact Us Section -->
+<!-- ======================================================================== -->
+<section class="section contact-section" id="contact">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-tag">WE LOVE HEARING FROM YOU</span>
+      <h2 class="section-title">Get in Touch with Nano 💌</h2>
+      <p class="section-desc">
+        Have a craving suggestion, kitchen question, or college project feedback? Drop us a sweet message below!
+      </p>
+    </div>
+
+    <div class="contact-card-wrapper">
+      <div class="contact-info-panel">
+        <h3>Nano's Craving Co. HQ 🍰</h3>
+        <p>Your friendly recipe companion, always here to inspire your next delicious meal.</p>
+
+        <div class="contact-details">
+          <div class="contact-row">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>128 Sweet Pastel Avenue, Foodie District</span>
+          </div>
+          <div class="contact-row">
+            <i class="fa-solid fa-envelope"></i>
+            <span>hello@nanoscravingco.com</span>
+          </div>
+          <div class="contact-row">
+            <i class="fa-solid fa-phone"></i>
+            <span>+1 (800) CRAVE-NANO</span>
+          </div>
+          <div class="contact-row">
+            <i class="fa-solid fa-clock"></i>
+            <span>Open 24/7 for hungry souls</span>
+          </div>
+        </div>
+
+        <div class="contact-pill-note">
+          <span>✨ Fast response within 24 hours guaranteed!</span>
+        </div>
+      </div>
+
+      <div class="contact-form-panel">
+        <form action="{{ url_for('contact') }}" method="POST" class="contact-form">
+          <div class="form-group">
+            <label for="contact_name"><i class="fa-regular fa-user"></i> Your Full Name</label>
+            <input type="text" id="contact_name" name="name" placeholder="e.g. Maya Sharma" required>
+          </div>
+
+          <div class="form-group">
+            <label for="contact_email"><i class="fa-regular fa-envelope"></i> Your Email Address</label>
+            <input type="email" id="contact_email" name="email" placeholder="e.g. maya@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="contact_message"><i class="fa-regular fa-comment-dots"></i> Your Message / Feedback</label>
+            <textarea id="contact_message" name="message" rows="4" placeholder="Tell us which recipe you want to try next or ask a question..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit-contact">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

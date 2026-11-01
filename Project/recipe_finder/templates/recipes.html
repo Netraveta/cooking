@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}All 50 Recipes | NANO'S CRAVING CO. 🍽️{% endblock %}
+
+{% block content %}
+<div class="page-header-banner">
+  <div class="container">
+    <div class="page-header-content text-center">
+      <span class="section-tag">COMPLETE CULINARY ARCHIVE</span>
+      <h1 class="page-title">Explore All 50 Handcrafted Recipes 🍽️</h1>
+      <p class="page-subtitle">
+        Authentic flavors from Mexican, Italian, Indian, Chinese, and American kitchens. Filter by diet, cooking time, or ingredient!
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container recipes-page-container">
+  <!-- ====================================================================== -->
+  <!-- Search & Filter Control Center -->
+  <!-- ====================================================================== -->
+  <section class="filter-control-panel">
+    <div class="filter-grid">
+      <!-- Search Bar -->
+      <div class="filter-item filter-search">
+        <label for="searchInput"><i class="fa-solid fa-magnifying-glass"></i> Search Recipe or Ingredient</label>
+        <div class="search-input-wrap">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by dish name or ingredient (e.g., Chicken, Tomato, Rice, Cheese)..." 
+            value="{{ search_query }}"
+          >
+          <button type="button" id="clearSearchBtn" class="btn-clear-input" title="Clear Search">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuisine Filter -->
+      <div class="filter-item">
+        <label for="cuisineSelect"><i class="fa-solid fa-globe"></i> Cuisine / Country</label>
+        <select id="cuisineSelect" class="filter-dropdown">
+          <option value="All" {% if selected_cuisine == 'All' or not selected_cuisine %}selected{% endif %}>All Cuisines (50)</option>
+          <option value="Mexican" {% if selected_cuisine == 'Mexican' %}selected{% endif %}>🌮 Mexican (10)</option>
+          <option value="Italian" {% if selected_cuisine == 'Italian' %}selected{% endif %}>🍕 Italian (10)</option>
+          <option value="Indian" {% if selected_cuisine == 'Indian' %}selected{% endif %}>🍛 Indian (10)</option>
+          <option value="Chinese" {% if selected_cuisine == 'Chinese' %}selected{% endif %}>🥟 Chinese (10)</option>
+          <option value="American" {% if selected_cuisine == 'American' %}selected{% endif %}>🍔 American (10)</option>
+        </select>
+      </div>
+
+      <!-- Dietary Filter -->
+      <div class="filter-item">
+        <label for="dietarySelect"><i class="fa-solid fa-seedling"></i> Dietary Preference</label>
+        <select id="dietarySelect" class="filter-dropdown">
+          <option value="All" {% if selected_dietary == 'All' or not selected_dietary %}selected{% endif %}>All Diets (50)</option>
+          <option value="Both" {% if selected_dietary == 'Both' or selected_dietary == 'Both (Veg & Non-Veg)' %}selected{% endif %}>💖 Both (Veg & Non-Veg)</option>
+          <option value="Vegetarian" {% if selected_dietary == 'Vegetarian' %}selected{% endif %}>🟢 Vegetarian</option>
+          <option value="Non-Vegetarian" {% if selected_dietary == 'Non-Vegetarian' %}selected{% endif %}>🔴 Non-Vegetarian</option>
+          <option value="Vegan" {% if selected_dietary == 'Vegan' %}selected{% endif %}>🌱 Vegan</option>
+        </select>
+      </div>
+
+      <!-- Cooking Time Filter -->
+      <div class="filter-item">
+        <label for="timeSelect"><i class="fa-regular fa-clock"></i> Cooking Time</label>
+        <select id="timeSelect" class="filter-dropdown">
+          <option value="All" {% if selected_time == 'All' or not selected_time %}selected{% endif %}>Any Cook Time</option>
+          <option value="quick" {% if selected_time == 'quick' %}selected{% endif %}>⚡ Quick (15 mins or less)</option>
+          <option value="medium" {% if selected_time == 'medium' %}selected{% endif %}>🍲 Medium (16 to 30 mins)</option>
+          <option value="long" {% if selected_time == 'long' %}selected{% endif %}>🥘 Slow Cooked (31+ mins)</option>
+        </select>
+      </div>
+
+      <!-- Reset Button -->
+      <div class="filter-item filter-reset-wrap">
+        <label>&nbsp;</label>
+        <button type="button" id="resetFiltersBtn" class="btn-reset-filters">
+          <i class="fa-solid fa-rotate-left"></i> Reset Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Filter Status & Recipe Counter -->
+    <div class="filter-status-bar">
+      <div class="results-count-wrap">
+        <span class="count-badge" id="resultsCount">{{ total_count }}</span>
+        <span>Recipes Available</span>
+      </div>
+      <div class="filter-tags-wrap" id="activeFilterTags">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================== -->
+  <!-- 50 Recipe Cards Grid -->
+  <!-- ====================================================================== -->
+  <div class="recipes-grid" id="recipesGrid">
+    {% for r in recipes %}
+      <div 
+        class="recipe-card" 
+        data-id="{{ r.id }}"
+        data-name="{{ r.name | lower }}"
+        data-cuisine="{{ r.cuisine }}"
+        data-dietary="{{ r.dietary }}"
+        data-cooktime="{{ r.cook_time }}"
+        data-ingredients="{{ r.ingredients | lower }}"
+      >
+        <!-- Food Image ABOVE Name and Ingredients -->
+        <div class="card-img-container">
+          <img 
+            src="{{ r.image_url }}" 
+            alt="{{ r.name }}" 
+            class="recipe-img"
+            loading="lazy"
+            onerror="this.onerror=null; this.src='{{ r.local_image }}';"
+          >
+          <!-- Dietary Badge -->
+          <span class="diet-badge diet-{{ r.dietary.lower().replace('-', '') }}">
+            {% if r.dietary == 'Vegetarian' %}🟢 Veg
+            {% elif r.dietary == 'Vegan' %}🌱 Vegan
+            {% else %}🔴 Non-Veg{% endif %}
+          </span>
+
+          <!-- Country/Category Badge -->
+          <span class="cuisine-badge">{{ r.cuisine }}</span>
+
+          <!-- Favourite Heart Toggle Button -->
+          <button 
+            type="button" 
+            class="btn-fav {% if r.id in fav_ids %}is-favourite{% endif %}" 
+            data-recipe-id="{{ r.id }}"
+            title="Save to Favourites"
+            aria-label="Save to Favourites"
+          >
+            <i class="{% if r.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+          </button>
+        </div>
+
+        <!-- Recipe Content -->
+        <div class="card-body">
+          <div class="card-meta">
+            <span><i class="fa-regular fa-clock"></i> {{ r.cook_time }} mins</span>
+            <span><i class="fa-solid fa-fire"></i> {{ r.difficulty }}</span>
+            <span><i class="fa-solid fa-users"></i> {{ r.servings }} Servings</span>
+          </div>
+
+          <h3 class="recipe-title">{{ r.name }}</h3>
+          <p class="recipe-desc">{{ r.description }}</p>
+
+          <div class="card-footer">
+            <a href="{{ url_for('recipe_details', recipe_id=r.id) }}" class="btn-card-view">
+              View Recipe <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Empty State when no recipes match search or filters -->
+  <div id="noRecipesState" class="empty-recipes-state" style="display: none;">
+    <div class="empty-icon">🍽️💔</div>
+    <h3>No matching cravings found!</h3>
+    <p>We couldn't find any recipes matching your current search or filter combination.</p>
+    <div class="empty-actions">
+      <button type="button" class="btn-primary" onclick="resetAllFilters();">
+        <i class="fa-solid fa-rotate-left"></i> Clear All Filters
+      </button>
+      <a href="{{ url_for('preferences') }}" class="btn-secondary">
+        <i class="fa-solid fa-sparkles"></i> Try Personalized Suggestions
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }} Recipe | NANO'S CRAVING CO. 🍽️{% endblock %}
+
+{% block content %}
+<div class="recipe-details-container container">
+  <!-- Back Button & Breadcrumbs Navigation -->
+  <div class="details-top-bar">
+    <a href="{{ url_for('recipes') }}" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Back to Recipes
+    </a>
+    <div class="breadcrumbs">
+      <a href="{{ url_for('index') }}">Home</a> &gt;
+      <a href="{{ url_for('recipes', cuisine=recipe.cuisine) }}">{{ recipe.cuisine }}</a> &gt;
+      <span>{{ recipe.name }}</span>
+    </div>
+  </div>
+
+  <!-- Hero Header for Recipe Details -->
+  <article class="recipe-detail-card">
+    <!-- Large Food Image at the Top -->
+    <div class="detail-hero-media">
+      <img 
+        src="{{ recipe.image_url }}" 
+        alt="{{ recipe.name }}" 
+        class="detail-hero-img"
+        onerror="this.onerror=null; this.src='{{ recipe.local_image }}';"
+      >
+      <div class="detail-img-overlay">
+        <div class="overlay-badges">
+          <span class="detail-cuisine-pill">
+            <i class="fa-solid fa-location-dot"></i> {{ recipe.cuisine }} Cuisine
+          </span>
+          <span class="diet-badge diet-{{ recipe.dietary.lower().replace('-', '') }}">
+            {% if recipe.dietary == 'Vegetarian' %}🟢 Vegetarian
+            {% elif recipe.dietary == 'Vegan' %}🌱 Vegan
+            {% else %}🔴 Non-Vegetarian{% endif %}
+          </span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-fav-large {% if is_favourite %}is-favourite{% endif %}" 
+          data-recipe-id="{{ recipe.id }}"
+          id="detailFavBtn"
+        >
+          <i class="{% if is_favourite %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+          <span id="detailFavText">{% if is_favourite %}Saved to Cravings{% else %}Save Recipe{% endif %}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Details -->
+    <div class="detail-header-body">
+      <h1 class="detail-recipe-name">{{ recipe.name }}</h1>
+      <p class="detail-recipe-desc">{{ recipe.description }}</p>
+
+      <!-- Quick Metrics Bar -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon">⏱️</div>
+          <div class="metric-info">
+            <span class="m-label">Prep Time</span>
+            <span class="m-value">{{ recipe.prep_time }} mins</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🍳</div>
+          <div class="metric-info">
+            <span class="m-label">Cook Time</span>
+            <span class="m-value">{{ recipe.cook_time }} mins</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🍽️</div>
+          <div class="metric-info">
+            <span class="m-label">Total Time</span>
+            <span class="m-value">{{ recipe.prep_time + recipe.cook_time }} mins</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">👥</div>
+          <div class="metric-info">
+            <span class="m-label">Servings</span>
+            <span class="m-value">{{ recipe.servings }} people</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">⭐</div>
+          <div class="metric-info">
+            <span class="m-label">Difficulty</span>
+            <span class="m-value">{{ recipe.difficulty }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-Column Cooking Guide: Ingredients & Instructions -->
+    <div class="cooking-layout-grid">
+      <!-- Ingredients Column -->
+      <div class="cooking-col ingredients-col">
+        <div class="column-card">
+          <div class="col-header">
+            <h3><i class="fa-solid fa-basket-shopping"></i> Complete Ingredients</h3>
+            <span class="badge-count">{{ ingredients_list | length }} items</span>
+          </div>
+
+          <!-- Interactive Quantity / People Eating Adjuster -->
+          <div class="servings-stepper-panel">
+            <div class="ssp-header">
+              <span class="ssp-title"><i class="fa-solid fa-users"></i> Adjust Quantity (People Eating):</span>
+              <span class="ssp-scale-badge" id="scaleBadge">1x Base</span>
+            </div>
+            <div class="ssp-controls">
+              <button type="button" class="btn-ssp-step" id="btnDetailMinus" aria-label="Decrease Servings">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <div class="ssp-display">
+                <span class="ssp-num" id="detailServingsCount" data-base="{{ recipe.servings }}">{{ user_servings or recipe.servings }}</span>
+                <span class="ssp-label" id="detailServingsLabel">{% if user_servings == 1 %}Person Eating{% else %}People Eating{% endif %}</span>
+              </div>
+              <button type="button" class="btn-ssp-step" id="btnDetailPlus" aria-label="Increase Servings">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <button type="button" class="btn-ssp-reset" id="btnDetailReset" title="Reset to original servings">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+            <p class="ssp-hint">💡 Ingredient measurements automatically recalculate below for your party size!</p>
+          </div>
+
+          <p class="col-subtext">Tap any item to cross it off as you gather ingredients:</p>
+          
+          <ul class="ingredients-checklist" id="ingredientsChecklist">
+            {% for item in ingredients_list %}
+              <li class="checklist-item" data-original="{{ item }}">
+                <label class="check-container">
+                  <input type="checkbox">
+                  <span class="checkmark"></span>
+                  <span class="ingredient-name">{{ item }}</span>
+                </label>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <div class="ingredients-footer">
+            <button type="button" class="btn-print" onclick="window.print();">
+              <i class="fa-solid fa-print"></i> Print Recipe Card
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions Column -->
+      <div class="cooking-col instructions-col">
+        <div class="column-card">
+          <div class="col-header">
+            <h3><i class="fa-solid fa-fire-burner"></i> Step-by-Step Instructions</h3>
+            <span class="badge-count">{{ instructions_list | length }} steps</span>
+          </div>
+          <p class="col-subtext">Follow these beginner-friendly steps to kitchen perfection:</p>
+
+          <ol class="instructions-steps-list">
+            {% for step in instructions_list %}
+              <li class="instruction-step">
+                <div class="step-num-pill">{{ loop.index }}</div>
+                <div class="step-content">
+                  <p>{{ step }}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ol>
+
+          <div class="cooking-pro-tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">
+              <strong>Nano's Sweet Pro-Tip:</strong>
+              <span>Always taste and adjust seasoning (salt, acidity, spices) in the final 2 minutes of cooking for restaurant-quality flavor!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="details-bottom-actions">
+      <a href="{{ url_for('recipes') }}" class="btn-primary">
+        <i class="fa-solid fa-arrow-left"></i> Back to All Recipes
+      </a>
+      <a href="{{ url_for('preferences') }}" class="btn-secondary">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recipes Matching Your Diet
+      </a>
+    </div>
+  </article>
+
+  <!-- Related Recipes Section -->
+  {% if related %}
+    <section class="related-section">
+      <div class="section-header text-center">
+        <span class="section-tag">MORE FROM {{ recipe.cuisine.upper() }} CUISINE</span>
+        <h2 class="section-title">You Might Also Love These 🍽️</h2>
+      </div>
+
+      <div class="recipes-grid">
+        {% for r in related %}
+          <div class="recipe-card">
+            <div class="card-img-container">
+              <img 
+                src="{{ r.image_url }}" 
+                alt="{{ r.name }}" 
+                class="recipe-img"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='{{ r.local_image }}';"
+              >
+              <span class="diet-badge diet-{{ r.dietary.lower().replace('-', '') }}">
+                {% if r.dietary == 'Vegetarian' %}🟢 Veg
+                {% elif r.dietary == 'Vegan' %}🌱 Vegan
+                {% else %}🔴 Non-Veg{% endif %}
+              </span>
+              <span class="cuisine-badge">{{ r.cuisine }}</span>
+              <button 
+                type="button" 
+                class="btn-fav {% if r.id in fav_ids %}is-favourite{% endif %}" 
+                data-recipe-id="{{ r.id }}"
+                title="Save to Favourites"
+                aria-label="Save to Favourites"
+              >
+                <i class="{% if r.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> {{ r.cook_time }} mins</span>
+                <span><i class="fa-solid fa-fire"></i> {{ r.difficulty }}</span>
+              </div>
+              <h3 class="recipe-title">{{ r.name }}</h3>
+              <p class="recipe-desc">{{ r.description }}</p>
+              <div class="card-footer">
+                <a href="{{ url_for('recipe_details', recipe_id=r.id) }}" class="btn-card-view">
+                  View Recipe <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

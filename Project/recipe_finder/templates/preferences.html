@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Your Craving Profile | NANO'S CRAVING CO. 💖{% endblock %}
+
+{% block content %}
+<div class="page-header-banner">
+  <div class="container text-center">
+    <span class="section-tag">TAILORED JUST FOR YOU</span>
+    <h1 class="page-title">Personalized Craving Profile 💖</h1>
+    <p class="page-subtitle">
+      Tell us your taste preferences! We'll filter out unwanted ingredients and curate dishes that make your heart smile.
+    </p>
+  </div>
+</div>
+
+<div class="container form-page-container">
+  <div class="preferences-card-wrapper">
+    <!-- Form Card Left Aesthetic Hero Info -->
+    <div class="pref-intro-panel">
+      <div class="pref-badge">✨ 30-SECOND CRAVING QUIZ</div>
+      <h2>Let Nano Curate Your Dream Menu 🍽️</h2>
+      <p>
+        Everyone's palate and dietary needs are unique. By saving your 5 key details, our intelligent algorithm:
+      </p>
+
+      <ul class="pref-perks-list">
+        <li>
+          <span class="perk-bullet">🥑</span>
+          <div>
+            <strong>Strict Diet Matching</strong>
+            <span>Only suggests Vegetarian or Vegan recipes when requested.</span>
+          </div>
+        </li>
+        <li>
+          <span class="perk-bullet">🚫</span>
+          <div>
+            <strong>Intelligent Allergy Shield</strong>
+            <span>Automatically excludes any recipes containing ingredients you must avoid.</span>
+          </div>
+        </li>
+        <li>
+          <span class="perk-bullet">🌟</span>
+          <div>
+            <strong>Cuisine Highlighting</strong>
+            <span>Puts top-rated dishes from your favorite international kitchen first!</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="pref-quote-bubble">
+        <span>"Your kitchen rules, your cravings, zero guesswork!" 🍰</span>
+      </div>
+    </div>
+
+    <!-- Right Side: The 5-Field Form -->
+    <div class="pref-form-panel">
+      <form action="{{ url_for('preferences') }}" method="POST" class="pref-form" id="preferencesForm">
+        
+        <!-- Field 1: Full Name -->
+        <div class="form-group">
+          <label for="userName">
+            <span class="field-num">1</span>
+            <strong>Full Name</strong>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-with-icon">
+            <i class="fa-regular fa-user"></i>
+            <input 
+              type="text" 
+              id="userName" 
+              name="name" 
+              placeholder="e.g. Sophia Miller" 
+              value="{% if user_profile %}{{ user_profile.name }}{% endif %}"
+              required
+            >
+          </div>
+          <small class="form-hint">So we can greet you with a personalized welcome!</small>
+        </div>
+
+        <!-- Field 2: Age -->
+        <div class="form-group">
+          <label for="userAge">
+            <span class="field-num">2</span>
+            <strong>Your Age</strong>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-with-icon">
+            <i class="fa-regular fa-calendar"></i>
+            <input 
+              type="number" 
+              id="userAge" 
+              name="age" 
+              min="5" 
+              max="120" 
+              placeholder="e.g. 21" 
+              value="{% if user_profile %}{{ user_profile.age }}{% else %}21{% endif %}"
+              required
+            >
+          </div>
+          <small class="form-hint">Helps tailor portion sizes and flavor preferences.</small>
+        </div>
+
+        <!-- Field 3: Food Preference -->
+        <div class="form-group">
+          <label>
+            <span class="field-num">3</span>
+            <strong>Food Preference</strong>
+            <span class="required-star">*</span>
+          </label>
+          <div class="dietary-selector-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <label class="radio-pill-card">
+              <input 
+                type="radio" 
+                name="preference" 
+                value="Both (Veg & Non-Veg)" 
+                {% if not user_profile or user_profile.preference == 'Both (Veg & Non-Veg)' or user_profile.preference == 'Both' %}checked{% endif %}
+              >
+              <div class="radio-card-content">
+                <span class="pill-emoji">💖</span>
+                <strong>Both (Veg & Non-Veg)</strong>
+                <small>Enjoy both vegetarian and meat dishes</small>
+              </div>
+            </label>
+
+            <label class="radio-pill-card">
+              <input 
+                type="radio" 
+                name="preference" 
+                value="Vegetarian" 
+                {% if user_profile and user_profile.preference == 'Vegetarian' %}checked{% endif %}
+              >
+              <div class="radio-card-content">
+                <span class="pill-emoji">🟢</span>
+                <strong>Vegetarian</strong>
+                <small>Plant-based & dairy dishes only</small>
+              </div>
+            </label>
+
+            <label class="radio-pill-card">
+              <input 
+                type="radio" 
+                name="preference" 
+                value="Non-Vegetarian"
+                {% if user_profile and user_profile.preference == 'Non-Vegetarian' %}checked{% endif %}
+              >
+              <div class="radio-card-content">
+                <span class="pill-emoji">🔴</span>
+                <strong>Non-Vegetarian</strong>
+                <small>Meat, chicken & all dishes</small>
+              </div>
+            </label>
+
+            <label class="radio-pill-card">
+              <input 
+                type="radio" 
+                name="preference" 
+                value="Vegan"
+                {% if user_profile and user_profile.preference == 'Vegan' %}checked{% endif %}
+              >
+              <div class="radio-card-content">
+                <span class="pill-emoji">🌱</span>
+                <strong>Vegan</strong>
+                <small>100% strictly plant-based</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Field: Adjust Quantity (People Eating) -->
+        <div class="form-group">
+          <label for="prefPeopleCount">
+            <span class="field-num">👥</span>
+            <strong>Quantity (People Eating)</strong>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-users"></i>
+            <input 
+              type="number" 
+              id="prefPeopleCount" 
+              name="people_count" 
+              min="1" 
+              max="20" 
+              placeholder="e.g. 2" 
+              value="{% if user_profile and user_profile.people_count %}{{ user_profile.people_count }}{% else %}2{% endif %}"
+              required
+            >
+          </div>
+          <small class="form-hint">Recipes and ingredient portions will automatically scale to this party size!</small>
+        </div>
+
+        <!-- Field 4: Favourite Cuisine -->
+        <div class="form-group">
+          <label for="favCuisine">
+            <span class="field-num">4</span>
+            <strong>Favourite Cuisine</strong>
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-globe"></i>
+            <select id="favCuisine" name="favourite_cuisine" class="pref-select" required>
+              <option value="Italian" {% if not user_profile or user_profile.favourite_cuisine == 'Italian' %}selected{% endif %}>🍕 Italian (Pasta, Pizzas, Risottos)</option>
+              <option value="Mexican" {% if user_profile and user_profile.favourite_cuisine == 'Mexican' %}selected{% endif %}>🌮 Mexican (Tacos, Burritos, Quesadillas)</option>
+              <option value="Indian" {% if user_profile and user_profile.favourite_cuisine == 'Indian' %}selected{% endif %}>🍛 Indian (Biryanis, Dosas, Curries)</option>
+              <option value="Chinese" {% if user_profile and user_profile.favourite_cuisine == 'Chinese' %}selected{% endif %}>🥟 Chinese (Noodles, Dumplings, Fried Rice)</option>
+              <option value="American" {% if user_profile and user_profile.favourite_cuisine == 'American' %}selected{% endif %}>🍔 American (Burgers, Mac & Cheese, Pies)</option>
+            </select>
+          </div>
+          <small class="form-hint">Dishes from this cuisine will be prominently featured at the top of your recommendations!</small>
+        </div>
+
+        <!-- Field 5: Allergies or Ingredients to Avoid -->
+        <div class="form-group">
+          <label for="allergiesInput">
+            <span class="field-num">5</span>
+            <strong>Allergies or Ingredients to Avoid</strong>
+          </label>
+          <div class="input-with-icon textarea-wrap">
+            <i class="fa-solid fa-shield-halved"></i>
+            <input 
+              type="text"
+              id="allergiesInput" 
+              name="allergies" 
+              placeholder="e.g. peanuts, mushrooms, dairy, eggs, bacon (separate with commas)"
+              value="{% if user_profile and user_profile.allergies %}{{ user_profile.allergies }}{% endif %}"
+            >
+          </div>
+          <small class="form-hint">Type any ingredients you dislike or cannot eat. We will automatically exclude them!</small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pref-submit-wrap">
+          <button type="submit" class="btn-pref-submit">
+            <span>Save Preferences & View My Recommendations</span>
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

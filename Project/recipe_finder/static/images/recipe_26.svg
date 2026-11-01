@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="bgGrad26" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0F3" />
+      <stop offset="100%" stop-color="#FFCCD5" />
+    </linearGradient>
+    <filter id="shadow26" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#E63946" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="url(#bgGrad26)" rx="24"/>
+  
+  <!-- Decorative Circles & Sparkles -->
+  <circle cx="120" cy="90" r="60" fill="#FFFFFF" fill-opacity="0.4" />
+  <circle cx="700" cy="400" r="90" fill="#FFFFFF" fill-opacity="0.35" />
+  <circle cx="680" cy="110" r="30" fill="#E63946" fill-opacity="0.15" />
+  <circle cx="100" cy="420" r="45" fill="#E63946" fill-opacity="0.12" />
+
+  <!-- Girly Sparkles & Stars -->
+  <g fill="#E63946" opacity="0.6">
+    <path d="M 620 70 Q 620 85 605 85 Q 620 85 620 100 Q 620 85 635 85 Q 620 85 620 70 Z" />
+    <path d="M 180 370 Q 180 380 170 380 Q 180 380 180 390 Q 180 380 190 380 Q 180 380 180 370 Z" />
+    <path d="M 730 250 Q 730 260 720 260 Q 730 260 730 270 Q 730 260 740 260 Q 730 260 730 250 Z" />
+  </g>
+
+  <!-- Central Dish Card Platform -->
+  <g filter="url(#shadow26)">
+    <circle cx="400" cy="220" r="140" fill="#FFFFFF" />
+    <circle cx="400" cy="220" r="128" fill="#FFF0F3" fill-opacity="0.6" stroke="#E63946" stroke-width="2.5" stroke-dasharray="6,6"/>
+  </g>
+
+  <!-- Giant Emoji / Food Illustration -->
+  <text x="400" y="270" font-size="110" text-anchor="middle" font-family="'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif">🍗</text>
+
+  <!-- Cuisine Tag Badge -->
+  <g transform="translate(400, 65)">
+    <rect x="-85" y="-18" width="170" height="36" rx="18" fill="#E63946" />
+    <text x="0" y="5" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">INDIAN SPECIAL</text>
+  </g>
+
+  <!-- Recipe Title Ribbon -->
+  <g transform="translate(400, 420)">
+    <rect x="-260" y="-36" width="520" height="62" rx="20" fill="#FFFFFF" fill-opacity="0.95" />
+    <text x="0" y="4" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="800" fill="#2B2D42" text-anchor="middle">Butter Chicken</text>
+    <text x="0" y="21" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="12" font-weight="600" fill="#E63946" text-anchor="middle" letter-spacing="1">NANO'S CRAVING CO. ✨</text>
+  </g>
+</svg>

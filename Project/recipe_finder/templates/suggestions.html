@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Tailored Suggestions for {{ user_profile.name }} | NANO'S CRAVING CO. 💖{% endblock %}
+
+{% block content %}
+<div class="page-header-banner">
+  <div class="container text-center">
+    <div class="welcome-chip">
+      <span>💖 PERSONALISED RECOMMENDATION REPORT</span>
+    </div>
+    <h1 class="page-title">
+      Welcome, <span class="gradient-text">{{ user_profile.name }}</span>! 🍽️✨
+    </h1>
+    <p class="page-subtitle">
+      Here are the hand-crafted recipes tailored to your cravings, lifestyle, and dietary preferences.
+    </p>
+  </div>
+</div>
+
+<div class="container suggestions-page-container">
+  <!-- ====================================================================== -->
+  <!-- User Profile Summary Card -->
+  <!-- ====================================================================== -->
+  <div class="profile-summary-card">
+    <div class="profile-info-grid">
+      <div class="prof-pill">
+        <span class="prof-label">Full Name</span>
+        <span class="prof-val">{{ user_profile.name }}</span>
+      </div>
+      <div class="prof-pill">
+        <span class="prof-label">Age</span>
+        <span class="prof-val">{{ user_profile.age }} yrs</span>
+      </div>
+      <div class="prof-pill">
+        <span class="prof-label">Diet Preference</span>
+        <span class="prof-val">
+          {% if user_profile.preference == 'Both (Veg & Non-Veg)' or user_profile.preference == 'Both' %}💖 Both (Veg & Non-Veg)
+          {% elif user_profile.preference == 'Vegetarian' %}🟢 Vegetarian
+          {% elif user_profile.preference == 'Vegan' %}🌱 Vegan
+          {% else %}🔴 Non-Vegetarian{% endif %}
+        </span>
+      </div>
+      <div class="prof-pill">
+        <span class="prof-label">People Eating</span>
+        <span class="prof-val">👥 {{ user_profile.people_count or 2 }} People</span>
+      </div>
+      <div class="prof-pill">
+        <span class="prof-label">Favourite Cuisine</span>
+        <span class="prof-val">🌟 {{ user_profile.favourite_cuisine }}</span>
+      </div>
+      <div class="prof-pill">
+        <span class="prof-label">Allergies / Avoid List</span>
+        <span class="prof-val">
+          {% if user_profile.allergies %}
+            🛡️ {{ user_profile.allergies }}
+          {% else %}
+            ✨ None Specified (Full Menu Allowed)
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a href="{{ url_for('preferences') }}" class="btn-edit-profile">
+        <i class="fa-solid fa-pen-to-square"></i> Edit Preferences
+      </a>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- Section 1: Top Picks from Favourite Cuisine -->
+  <!-- ====================================================================== -->
+  <section class="suggestions-section">
+    <div class="section-header">
+      <span class="section-tag">STARRED FOR YOUR PALATE</span>
+      <h2 class="section-title">
+        Top Picks from your favorite: {{ user_profile.favourite_cuisine }} Cuisine 🌟
+      </h2>
+      <p class="section-desc">
+        {% if primary_picks %}
+          We found <strong>{{ primary_picks | length }}</strong> dishes perfectly matching your {{ user_profile.preference }} diet with zero allergens!
+        {% else %}
+          No exact dishes from {{ user_profile.favourite_cuisine }} met your strict allergy filter, but check out the delicious alternatives below!
+        {% endif %}
+      </p>
+    </div>
+
+    {% if primary_picks %}
+      <div class="recipes-grid">
+        {% for r in primary_picks %}
+          <div class="recipe-card starred-card">
+            <div class="card-img-container">
+              <img 
+                src="{{ r.image_url }}" 
+                alt="{{ r.name }}" 
+                class="recipe-img"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='{{ r.local_image }}';"
+              >
+              <span class="diet-badge diet-{{ r.dietary.lower().replace('-', '') }}">
+                {% if r.dietary == 'Vegetarian' %}🟢 Veg
+                {% elif r.dietary == 'Vegan' %}🌱 Vegan
+                {% else %}🔴 Non-Veg{% endif %}
+              </span>
+              <span class="cuisine-badge">{{ r.cuisine }}</span>
+
+              <button 
+                type="button" 
+                class="btn-fav {% if r.id in fav_ids %}is-favourite{% endif %}" 
+                data-recipe-id="{{ r.id }}"
+                title="Save to Favourites"
+                aria-label="Save to Favourites"
+              >
+                <i class="{% if r.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+              </button>
+
+              <div class="top-match-badge">
+                <i class="fa-solid fa-star"></i> Top Match
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> {{ r.cook_time }} mins</span>
+                <span><i class="fa-solid fa-fire"></i> {{ r.difficulty }}</span>
+                <span><i class="fa-solid fa-users"></i> {{ r.servings }} Servings</span>
+              </div>
+
+              <h3 class="recipe-title">{{ r.name }}</h3>
+              <p class="recipe-desc">{{ r.description }}</p>
+
+              <div class="card-footer">
+                <a href="{{ url_for('recipe_details', recipe_id=r.id) }}" class="btn-card-view">
+                  View Recipe <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- ====================================================================== -->
+  <!-- Section 2: Other Delicious Matches Across Global Cuisines -->
+  <!-- ====================================================================== -->
+  {% if other_picks %}
+    <section class="suggestions-section" style="margin-top: 50px;">
+      <div class="section-header">
+        <span class="section-tag">MORE FOR YOUR DIET</span>
+        <h2 class="section-title">More Delicious Safe Cravings for You 🍽️</h2>
+        <p class="section-desc">
+          Safe, verified {{ user_profile.preference }} recipes from other international kitchens without any of your restricted ingredients.
+        </p>
+      </div>
+
+      <div class="recipes-grid">
+        {% for r in other_picks %}
+          <div class="recipe-card">
+            <div class="card-img-container">
+              <img 
+                src="{{ r.image_url }}" 
+                alt="{{ r.name }}" 
+                class="recipe-img"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='{{ r.local_image }}';"
+              >
+              <span class="diet-badge diet-{{ r.dietary.lower().replace('-', '') }}">
+                {% if r.dietary == 'Vegetarian' %}🟢 Veg
+                {% elif r.dietary == 'Vegan' %}🌱 Vegan
+                {% else %}🔴 Non-Veg{% endif %}
+              </span>
+              <span class="cuisine-badge">{{ r.cuisine }}</span>
+
+              <button 
+                type="button" 
+                class="btn-fav {% if r.id in fav_ids %}is-favourite{% endif %}" 
+                data-recipe-id="{{ r.id }}"
+                title="Save to Favourites"
+                aria-label="Save to Favourites"
+              >
+                <i class="{% if r.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+              </button>
+            </div>
+
+            <div class="card-body">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> {{ r.cook_time }} mins</span>
+                <span><i class="fa-solid fa-fire"></i> {{ r.difficulty }}</span>
+              </div>
+
+              <h3 class="recipe-title">{{ r.name }}</h3>
+              <p class="recipe-desc">{{ r.description }}</p>
+
+              <div class="card-footer">
+                <a href="{{ url_for('recipe_details', recipe_id=r.id) }}" class="btn-card-view">
+                  View Recipe <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- If both primary and other picks are empty -->
+  {% if not primary_picks and not other_picks %}
+    <div class="empty-recipes-state">
+      <div class="empty-icon">🥗✨</div>
+      <h3>Strict Allergy Filters Applied!</h3>
+      <p>Your specified allergy filters excluded all 50 recipes. Try loosening your avoided ingredients list to see recipes!</p>
+      <div class="empty-actions">
+        <a href="{{ url_for('preferences') }}" class="btn-primary">
+          <i class="fa-solid fa-pen-to-square"></i> Update Preferences
+        </a>
+        <a href="{{ url_for('recipes') }}" class="btn-secondary">
+          <i class="fa-solid fa-utensils"></i> Browse All 50 Recipes
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
